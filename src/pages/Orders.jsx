@@ -5,24 +5,32 @@ import axios from 'axios'
 import { backendUrl, currency } from '../App'
 import { toast } from 'react-toastify'
 import { assets } from '../assets/admin_assets/assets'
+import Loader from './Loading'
 
 function Orders({ token }) {
   const [orders, setOrders] = useState([])
+  const [loading, setLoading] = useState(false)
   const fetchAllOrders = async () => {
 
     if (!token) {
       return null;
     }
     try {
+      setLoading(true)
       const response = await axios.post(backendUrl + '/api/order/list', {}, { headers: { token } })
       if (response.data.success) {
         setOrders(response.data.orders.reverse())
+        setLoading(false)
       }
       else {
         toast.error(response.data.message)
+        setLoading(false)
+
       }
     } catch (error) {
       toast.error(error.message)
+      setLoading(false)
+
 
     }
   }
@@ -58,6 +66,9 @@ function Orders({ token }) {
   useEffect(() => {
     fetchAllOrders();
   }, [token])
+
+
+  if (loading) return <Loader />
   return (
     <div>
       <h3>Order Page</h3>

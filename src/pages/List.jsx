@@ -2,22 +2,28 @@ import axios from "axios"
 import { useEffect, useState } from "react"
 import { backendUrl, currency } from "../App"
 import { toast } from "react-toastify"
+import Loader from "./Loading"
 
 
 function List({ token }) {
   const [list, setList] = useState([])
+  const [loading, setLoading] = useState(false)
   const fetchList = async () => {
     try {
+      setLoading(true)
       const response = await axios.get(backendUrl + "/api/product/list")
       if (response.data.success) {
         setList(response.data.products)
+        setLoading(false)
 
       } else {
         toast.error(response.data.message)
+        setLoading(false)
       }
     } catch (error) {
       console.log(error);
       toast.error(error.message)
+      setLoading(false)
 
     }
   }
@@ -25,7 +31,7 @@ function List({ token }) {
   const removeProduct = async (productId) => {
     try {
 
-      const response = await axios.delete(backendUrl + `/api/product/remove/${productId}` , { headers: { token } })
+      const response = await axios.delete(backendUrl + `/api/product/remove/${productId}`, { headers: { token } })
 
       if (response.data.success) {
         toast.success(response.data.message)
@@ -46,6 +52,8 @@ function List({ token }) {
   useEffect(() => {
     fetchList()
   }, [])
+
+  if (loading) return <Loader />
   return (
     <>
       <p className="mb-2 ">All Products List </p>

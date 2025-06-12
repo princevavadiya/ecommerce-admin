@@ -3,6 +3,7 @@ import { assets } from "../assets/admin_assets/assets"
 import axios from "axios"
 import { backendUrl } from "../App"
 import { toast } from "react-toastify"
+import Loader from "./Loading"
 
 
 
@@ -19,12 +20,14 @@ function Add({ token }) {
   const [subCategory, setSubCategory] = useState("TopWear")
   const [bestSeller, setBestseller] = useState(false)
   const [sizes, setSizes] = useState([])
+  const [loading, setLoading] = useState(false)
 
   const onSubmitHandler = async (e) => {
-    console.log(bestseller);
 
     e.preventDefault();
     try {
+      setLoading(true)
+
       const formData = new FormData()
 
       formData.append("name", name)
@@ -39,8 +42,8 @@ function Add({ token }) {
       image2 && formData.append("image2", image2)
       image3 && formData.append("image3", image3)
       image4 && formData.append("image4", image4)
-      console.log(formData);
-      
+      setLoading(false)
+
 
       const response = await axios.post(backendUrl + "/api/product/add", formData, { headers: { token } })
       if (response.data.success) {
@@ -57,20 +60,25 @@ function Add({ token }) {
         setImage3(false)
         setImage4(false)
 
+
       }
       else {
+
         toast.error(response.data.message)
+        setLoading(false)
       }
 
 
     } catch (error) {
+
       console.log(error);
       toast.error(error.message);
+      setLoading(false)
 
     }
   }
 
-
+  if (loading) return <Loader />
   return (
     <form onSubmit={onSubmitHandler} className="flex flex-col w-full items-start gap-3 ">
       <div>
